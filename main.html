@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tone in Color</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Didact+Gothic&display=swap" rel="stylesheet"/>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  
+  <!-- lightGallery -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/css/lightgallery-bundle.min.css" />
+
+  <style>
+    /* ── Variables ─────────────────────────────────── */
+    :root {
+      --cream:   #f5f0e8;
+      --ink:     #1a1612;
+      --muted:   #7a7166;
+      --accent:  #c9a84c;
+      --gap:     2px;
+    }
+
+    /* ── Reset / Base ──────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Didact Gothic', sans-serif;
+      overflow-x: hidden;
+      /* cursor: none; */
+    }
+
+    /* ── Custom cursor ─────────────────────────────── */
+    /* #cursor {
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform .15s ease, width .2s ease, height .2s ease;
+      mix-blend-mode: multiply;
+    }
+    body:has(a:hover) #cursor,
+    body:has(button:hover) #cursor { width: 36px; height: 36px; } */
+
+    /* ── Noise texture overlay ─────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 100;
+      opacity: .45;
+    }
+
+    /* ── Navbar ────────────────────────────────────── */
+    .site-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 200;
+      padding: 1.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      mix-blend-mode: multiply;
+    }
+
+    .site-nav .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .site-nav .brand span { color: var(--muted); }
+
+    .site-nav .nav-links a {
+      font-size: .75rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 2.5rem;
+      transition: color .3s;
+    }
+    .site-nav .nav-links a:hover { color: var(--ink); }
+
+    /* ── Hero ──────────────────────────────────────── */
+    #hero {
+      height: 60vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 3rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #e8e0d0 0%, #d6cfc0 60%, #c8bfaa 100%);
+    }
+
+    /* Hero decorative line */
+    .hero-line {
+      position: absolute;
+      top: 18%; right: 8%;
+      width: 1px; height: 0;
+      background: var(--accent);
+      transform-origin: top center;
+    }
+
+    .hero-tag {
+      position: relative;
+      font-size: .7rem;
+      letter-spacing: 1.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+      opacity: 0; transform: translateY(20px);
+    }
+
+    .hero-title {
+      position: relative;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(4rem, 10vw, 9rem);
+      font-weight: 300;
+      line-height: .95;
+      color: var(--ink);
+      overflow: hidden;
+    }
+
+    .hero-title .line { display: block; overflow: hidden; }
+    .hero-title .line span { display: block; transform: translateY(110%); }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--accent);
+      text-shadow: #ffcc00 0px 0 12px;
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2.5rem; right: 3rem;
+      writing-mode: vertical-rl;
+      font-size: .65rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+    }
+
+    /* ── Section header ────────────────────────────── */
+    .section-header {
+      padding: 3rem 3rem 3rem;
+      display: flex;
+      align-items: baseline;
+      gap: 2rem;
+    }
+
+    .section-label {
+      font-size: .65rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      color: var(--ink);
+    }
+
+    .section-rule {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--ink) 0%, transparent 100%);
+      margin-bottom: .4rem;
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    /* ── Gallery Navbar ────────────────────────────────────── */
+    .gallery-nav {
+      z-index: 200;
+      padding: 1.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      mix-blend-mode: multiply;
+    }
+
+    #galleryBar {
+      height: 120px;
+      height: clamp(100px, 40vw, 120px);
+      display: flex;
+      /* gap: 1.5rem; */
+      /* padding: 0 2rem 2rem; */
+    }
+
+    #galleryBar > div {
+      padding: 0;
+    }
+
+    #galleryBar .block-button {
+      width: 100%;
+      height: 100%;
+      font-size: .65rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-color: var(--muted);
+      transition: color .3s, border-color .3s;
+    }
+
+    /* ── Masonry / Gallery Grid ────────────────────── */
+    #gallery {
+      padding: 0 var(--gap) var(--gap);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: 80px;
+      gap: var(--gap);
+    }
+
+    /* Layout recipe — override per .photo-item variant */
+    .photo-item {
+      overflow: hidden;
+      position: relative;
+      /* cursor: none; */
+      opacity: 0;
+      transform: translateY(60px);
+    }
+
+    .photo-item:nth-child(1)  { grid-column: 1 / 8;  grid-row: 1 / 7; }
+    .photo-item:nth-child(2)  { grid-column: 8 / 13; grid-row: 1 / 5; }
+    .photo-item:nth-child(3)  { grid-column: 8 / 11; grid-row: 5 / 9; }
+    .photo-item:nth-child(4)  { grid-column: 11 / 13;grid-row: 5 / 9; }
+    .photo-item:nth-child(5)  { grid-column: 1 / 5;  grid-row: 7 / 13; }
+    .photo-item:nth-child(6)  { grid-column: 5 / 9;  grid-row: 7 / 11; }
+    .photo-item:nth-child(7)  { grid-column: 9 / 13; grid-row: 9 / 13; }
+    .photo-item:nth-child(8)  { grid-column: 5 / 9;  grid-row: 11 / 14; }
+
+    /* Image fills cell */
+    .photo-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .7s cubic-bezier(.25,.46,.45,.94);
+      filter: saturate(.85);
+    }
+
+    .photo-item:hover img {
+      transform: scale(1.06);
+      filter: saturate(1.1);
+    }
+
+    /* Caption overlay */
+    .photo-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2rem 1.2rem 1rem;
+      background: linear-gradient(to top, rgba(26,22,18,.65) 0%, transparent 100%);
+      color: #fff;
+      transform: translateY(100%);
+      transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+    }
+
+    .photo-item:hover .photo-caption { transform: translateY(0); }
+
+    .photo-caption h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: .05em;
+    }
+
+    .photo-caption p {
+      font-size: .65rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      opacity: .7;
+      margin-top: .2rem;
+    }
+
+    /* Gold corner accent */
+    .photo-item::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 0 0 0;
+      border-color: transparent transparent transparent var(--accent);
+      transition: border-width .3s ease;
+    }
+    .photo-item:hover::after {
+      border-width: 32px 32px 0 0;
+      border-color: var(--accent) transparent transparent transparent;
+    }
+
+    /* ── Featured / Full-bleed row ─────────────────── */
+    #featured {
+      /* padding: 8rem 0; */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-track {
+      display: flex;
+      gap: 3rem;
+      padding: 0 3rem;
+      will-change: transform;
+    }
+
+    .featured-card {
+      flex: 0 0 clamp(360px, 60vw, 620px);
+      flex: 0 0 clamp(300px, 50vh, 500px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .featured-card img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      display: block;
+      filter: saturate(.8);
+      transition: filter .5s;
+    }
+
+    .featured-card:hover img { filter: saturate(1.15); }
+
+    .featured-card .card-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      margin-top: 1rem;
+      color: var(--ink);
+    }
+
+    .featured-card .card-meta {
+      font-size: .65rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: .3rem;
+    }
+
+    /* ── About strip ───────────────────────────────── */
+    #about {
+      border-top: 1px solid rgba(26,22,18,.12);
+      padding: 7rem 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-heading {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      color: var(--ink);
+    }
+
+    .about-heading em { font-style: italic; color: var(--muted); }
+
+    .about-body {
+      font-size: .9rem;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .about-body + .about-body { margin-top: 1.2rem; }
+
+    .btn-outline-ink {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: .7rem 2rem;
+      border: 1px solid var(--ink);
+      font-size: .7rem;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      transition: background .3s, color .3s;
+    }
+    .btn-outline-ink:hover { background: var(--ink); color: var(--cream); }
+
+    /* ── Footer ────────────────────────────────────── */
+    footer {
+      border-top: 1px solid rgba(26,22,18,.12);
+      padding: 2.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer .foot-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 300;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+    }
+
+    footer small {
+      font-size: .65rem;
+      letter-spacing: .15em;
+      color: var(--muted);
+    }
+
+    /* ── Lightbox ──────────────────────────────────── */
+    #lightbox {
+      position: fixed; inset: 0;
+      background: rgba(26,22,18,.94);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #lightbox.open { opacity: 1; pointer-events: all; }
+
+    #lightbox img {
+      max-width: 85vw;
+      max-height: 85vh;
+      object-fit: contain;
+      box-shadow: 0 40px 120px rgba(0,0,0,.6);
+      transform: scale(.92);
+      transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+    }
+
+    #lightbox.open img { transform: scale(1); }
+
+    #lightbox-close {
+      position: absolute;
+      top: 2rem; right: 2.5rem;
+      color: #fff;
+      font-size: 1.5rem;
+      /* cursor: none; */
+      letter-spacing: .2em;
+      font-family: 'Didact Gothic', sans-serif;
+      font-size: .7rem;
+      text-transform: uppercase;
+    }
+
+    /* ── Responsive tweaks ─────────────────────────── */
+    @media (max-width: 768px) {
+      .site-nav { padding: 1.2rem 1.5rem; }
+      .site-nav .nav-links { display: none; }
+      #hero { padding: 0 1.5rem 4rem; }
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: 200px;
+      }
+      .photo-item { grid-column: auto !important; grid-row: auto !important; }
+      .section-header { padding: 4rem 1.5rem 2rem; }
+      #about { grid-template-columns: 1fr; padding: 4rem 1.5rem; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div id="cursor"></div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" role="dialog" aria-modal="true">
+    <span id="lightbox-close" role="button" tabindex="0">✕ close</span>
+    <img src="" alt="" id="lightbox-img"/>
+  </div>
+
+  <!-- ── NAVBAR ─────────────────────────────────────── -->
+  <nav class="site-nav">
+    <a href="#" class="brand">Tone<span>/Color</span></a>
+    <div class="nav-links">
+      <a href="#gallery">Gallery</a>
+      <a href="#featured">Featured</a>
+      <a href="#about">About</a>
+      <a href="#">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────────── -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-line" id="heroLine"></div>
+
+    <p class="hero-tag">Anthony Gamboa</p>
+    <h1 class="hero-title">
+      <span class="line"><span>Tone</span></span>
+      <span class="line"><span><em>Color</em></span></span>
+    </h1>
+
+    <p class="hero-scroll-hint">Scroll to explore</p>
+  </section>
+
+  <!-- ── GALLERY ────────────────────────────────────── -->
+  <section id="gallery">
+    <div class="section-header">
+      <span class="section-label">01 / Collection</span>
+      <hr class="section-rule"/>
+      <h2 class="section-title">Gallery</h2>
+    </div>
+
+    <!-- <nav class="navbar bg-body-tertiary gallery-nav">
+      <form class="container-fluid justify-content-start nav-links">
+        <div class="btn-group btn-group-justified" role="group" aria-label="Basic example">
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary" type="button">everything</button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary" type="button">birds</button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary" type="button">beasts</button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary" type="button">bodies</button>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary" type="button">buildings</button>
+          </div>
+        </div>
+      </form>
+    </nav> -->
+
+    <div id="galleryBar" class="row">
+      <div class="col-lg-3 col-md-6" >
+        <button class="btn btn-outline-secondary block-button" type="button">birds</button>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <button class="btn btn-outline-secondary block-button" type="button">beasts</button>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <button class="btn btn-outline-secondary block-button" type="button">bodies</button>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <button class="btn btn-outline-secondary block-button" type="button">buildings</button>
+      </div>
+    </div>
+
+    <!-- <div class="gallery-grid">
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-btn active" data-filter="all" onclick="applyFilter('all')">everything</button>
+      </div>
+      <!-- lightGallery is initialised on this element -->
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-btn active" data-filter="all" onclick="applyFilter('all')">everything</button>
+    </div>
+    <div class="grid" id="grid">
+      <div class="skeleton" style="height:280px"></div>
+      <div class="skeleton" style="height:380px"></div>
+      <div class="skeleton" style="height:220px"></div>
+      <div class="skeleton" style="height:340px"></div>
+      <div class="skeleton" style="height:260px"></div>
+      <div class="skeleton" style="height:420px"></div>
+    </div>
+  </section>
+
+  <!-- ── FEATURED (horizontal scroll strip) ─────────── -->
+  <section id="featured">
+    <div class="section-header">
+      <span class="section-label">02 / Series</span>
+      <hr class="section-rule"/>
+      <h2 class="section-title">Featured Work</h2>
+    </div>
+
+    <!-- GSAP horizontal scroll track -->
+    <div class="featured-track" id="featuredTrack">
+      <div class="featured-card">
+        <img src="https://picsum.photos/seed/feat1/600/800" alt="Featured 1" loading="lazy"/>
+        <p class="card-label">Into the Light</p>
+        <p class="card-meta">Series I · 6 photographs</p>
+      </div>
+      <div class="featured-card">
+        <img src="https://picsum.photos/seed/feat2/600/800" alt="Featured 2" loading="lazy"/>
+        <p class="card-label">Dusk Cities</p>
+        <p class="card-meta">Series II · 9 photographs</p>
+      </div>
+      <div class="featured-card">
+        <img src="https://picsum.photos/seed/feat3/600/800" alt="Featured 3" loading="lazy"/>
+        <p class="card-label">The Shore</p>
+        <p class="card-meta">Series III · 12 photographs</p>
+      </div>
+      <div class="featured-card">
+        <img src="https://picsum.photos/seed/feat4/600/800" alt="Featured 4" loading="lazy"/>
+        <p class="card-label">Forest Silence</p>
+        <p class="card-meta">Series IV · 8 photographs</p>
+      </div>
+      <div class="featured-card">
+        <img src="https://picsum.photos/seed/feat5/600/800" alt="Featured 5" loading="lazy"/>
+        <p class="card-label">Portraits, Unposed</p>
+        <p class="card-meta">Series V · 14 photographs</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ──────────────────────────────────────── -->
+  <section id="about">
+    <div class="about-left">
+      <h2 class="about-heading">
+        Capturing<br/><em>moments</em><br/>that endure.
+      </h2>
+    </div>
+    <div class="about-right">
+      <p class="about-body">
+        Lumière is a curated gallery celebrating the art of light, shadow, and the in-between.
+        Each photograph here is chosen not just for its technical precision, but for the feeling it
+        refuses to let go of.
+      </p>
+      <p class="about-body">
+        We work with photographers who believe that an image should breathe — that stillness and
+        motion can coexist in a single frame, and that beauty is most often found where you least
+        expect it.
+      </p>
+      <a href="#gallery" class="btn-outline-ink">View the collection</a>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────── -->
+  <footer>
+    <span class="foot-brand">Lumière</span>
+    <small>&copy; 2026 · All photographs reserved · Built with GSAP &amp; Bootstrap</small>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- lightGallery + plugins -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/lightgallery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/zoom/lg-zoom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/thumbnail/lg-thumbnail.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/2.7.2/plugins/fullscreen/lg-fullscreen.min.js"></script>
+
+  <script>
+    const PROXY = './photos.php';
+
+    let photos  = [];
+    let lgInstance = null;
+
+    /* ═══════════════════════════════════════════════════
+       GSAP ANIMATIONS
+    ═══════════════════════════════════════════════════ */
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ── Custom cursor ─────────────────────────────── */
+    // const cursor = document.getElementById('cursor');
+    // window.addEventListener('mousemove', e => {
+    //   gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: .25, ease: 'power2.out' });
+    // });
+
+    /* ── Hero entrance ─────────────────────────────── */
+    const heroTL = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+    heroTL
+      .to('#heroLine',        { height: 180, duration: 1.2, delay: .3 })
+      .to('.hero-title .line span', { y: 0, duration: 1.1, stagger: .12 }, '-=.9')
+      .to('.hero-tag',        { opacity: 1, y: 0, duration: .8 }, '-=.6')
+      .to('.hero-scroll-hint',{ opacity: 1, duration: .8 }, '-=.4');
+
+    /* ── Navbar fade ───────────────────────────────── */
+    gsap.from('.site-nav', { y: -30, opacity: 0, duration: 1, delay: .5, ease: 'power2.out' });
+
+    /* ── Section rules animate on scroll ──────────── */
+    gsap.utils.toArray('.section-rule').forEach(rule => {
+      gsap.to(rule, {
+        scaleX: 1, duration: 1.2, ease: 'power3.inOut',
+        scrollTrigger: { trigger: rule, start: 'top 85%' }
+      });
+    });    
+    
+    // ── Fetch ─────────────────────────────────────────────────
+    async function fetchPhotos() {
+      const res  = await fetch(PROXY);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Could not load photos');
+      return json.data?.list || [];
+    }
+
+    // ── Fisher-Yates shuffle ──────────────────────────────────
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+        
+    // ── Filter buttons ────────────────────────────────────────
+    function buildFilters(list) {
+      const allTags = new Set(list.flatMap(p => p.tags || []));
+      if (!allTags.size) return;
+      const bar = document.getElementById('filter-bar');
+      [...allTags].sort().forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className    = 'filter-btn';
+        btn.dataset.filter = tag;
+        btn.textContent  = tag.charAt(0).toUpperCase() + tag.slice(1);
+        btn.addEventListener('click', () => applyFilter(tag));
+        bar.appendChild(btn);
+      });
+    }
+
+    function applyFilter(tag) {
+      document.querySelectorAll('.filter-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.filter === tag)
+      );
+      const filtered = tag === 'all'
+        ? photos
+        : photos.filter(p => (p.tags || []).includes(tag));
+      renderPhotos(filtered);
+    }
+    
+    // ── Render grid + init lightGallery ───────────────────────
+    function renderPhotos(list) {
+      const grid = document.getElementById('grid');
+
+      // Destroy previous lightGallery instance before rebuilding DOM
+      if (lgInstance) { lgInstance.destroy(); lgInstance = null; }
+
+      grid.innerHTML = '';
+
+      if (!list.length) {
+        grid.innerHTML = `<div class="state-message">
+          <div class="icon">◻</div>
+          <h2>No photos found</h2>
+          <p>Upload images to the <code>/photos</code> folder on your server.</p>
+        </div>`;
+        return;
+      }
+
+      list.forEach(photo => {
+        // lightGallery reads data-src (full) and data-thumb from the anchor
+        const a = document.createElement('a');
+        a.href              = photo.full;
+        a.dataset.src       = photo.full;
+        a.dataset.thumb     = photo.thumb;
+        a.dataset.subHtml   = `<p>${photo.caption}</p>`;
+        a.className         = 'grid-item';
+
+        a.innerHTML = `
+          <div class="grid-item-inner">
+            <img src="${photo.thumb}" alt="${photo.caption}" loading="lazy" />
+            <div class="overlay">
+              <div class="overlay-meta">
+                <strong>${photo.caption}</strong>
+              </div>
+            </div>
+          </div>`;
+
+        grid.appendChild(a);
+      });
+
+      // Initialise lightGallery on the grid container
+      lgInstance = lightGallery(grid, {
+        selector:        'a.grid-item',
+        plugins:         [lgZoom, lgThumbnail, lgFullscreen],
+        speed:           400,
+        download:        false,
+        counter:         true,
+        escKey:          true,
+        keyPress:        true,
+        // hideBarsDelay: 5000,
+        // mousewheel:      true,
+        hideScrollbar:   true,
+        // Zoom plugin options
+        scale:           1,
+        zoom:            true,
+        actualSize:      false,
+        showZoomInOutIcons: true,
+        // Thumbnail plugin options
+        thumbnail:       true,
+        animateThumb:    true,
+        currentPagerPosition: 'middle',
+        thumbWidth:      80,
+        thumbHeight:     '60px',
+        toggleThumb:     true,
+      });
+    }
+
+    function renderError(msg) {
+      document.getElementById('grid').innerHTML = `<div class="state-message">
+        <div class="icon">⊗</div>
+        <h2>Could not load photos</h2>
+        <p>${msg}</p>
+        <p>Check that <code>photos.php</code> is uploaded alongside <code>index.html</code>.</p>
+      </div>`;
+    }
+
+    /* ── Gallery items staggered reveal ───────────── */
+    gsap.utils.toArray('.photo-item').forEach((item, i) => {
+      gsap.to(item, {
+        opacity: 1, y: 0, duration: .9, ease: 'power3.out',
+        scrollTrigger: { trigger: item, start: 'top 88%' },
+        delay: (i % 3) * .12
+      });
+    });
+
+    /* ── Featured horizontal scroll (pinned) ──────── */
+    const track  = document.getElementById('featuredTrack');
+    const cards  = track.querySelectorAll('.featured-card');
+    const totalW = () => track.scrollWidth - document.documentElement.clientWidth ; // 96 = 3rem padding × 2
+
+    ScrollTrigger.create({
+      trigger: '#featured',
+      // start: 'top top+=80vh',
+      start: 'center center-=20vh',
+      end: () => `+=${totalW()}`,
+      pin: true,
+      scrub: 1,
+      animation: gsap.to(track, { x: () => -totalW(), ease: 'none' }),
+      invalidateOnRefresh: true,
+    });
+
+    // ScrollTrigger.create({
+    //   trigger: '#featuredTrack',
+    //   start: 'center center',
+    //   end: () => `+=${totalW()}`,
+    //   pin: true,
+    //   // scrub: 1,
+    //   // animation: gsap.to(track, { x: () => -totalW(), ease: 'none' })
+    // });
+
+    /* ── Featured cards fade in ────────────────────── */
+    cards.forEach((card, i) => {
+      gsap.from(card, {
+        opacity: 0, y: 50, duration: .8,
+        scrollTrigger: { trigger: '#featured', start: 'top 70%' },
+        delay: i * .1
+      });
+    });
+
+    /* ── About section split reveal ───────────────── */
+    gsap.from('.about-heading', {
+      opacity: 0, x: -50, duration: 1, ease: 'power3.out',
+      scrollTrigger: { trigger: '#about', start: 'top 75%' }
+    });
+
+    gsap.from('.about-right', {
+      opacity: 0, x: 50, duration: 1, ease: 'power3.out',
+      scrollTrigger: { trigger: '#about', start: 'top 75%' },
+      delay: .15
+    });
+
+    /* ── Parallax on hero background ──────────────── */
+    gsap.to('.hero-bg', {
+      yPercent: 30,
+      ease: 'none',
+      scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+    });
+
+    /* ── Lightbox ──────────────────────────────────── */
+    const lightbox     = document.getElementById('lightbox');
+    const lightboxImg  = document.getElementById('lightbox-img');
+    const lightboxClose= document.getElementById('lightbox-close');
+
+    document.querySelectorAll('.photo-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const src = item.dataset.src || item.querySelector('img').src;
+        const alt = item.querySelector('img').alt;
+        lightboxImg.src = src;
+        lightboxImg.alt = alt;
+        gsap.to(lightbox, { opacity: 1, duration: .35, ease: 'power2.out' });
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    const closeLightbox = () => {
+      gsap.to(lightbox, {
+        opacity: 0, duration: .3, ease: 'power2.in',
+        onComplete: () => { lightbox.classList.remove('open'); document.body.style.overflow = ''; }
+      });
+    };
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    lightboxClose.addEventListener('keydown', e => { if (e.key === 'Enter') closeLightbox(); });
+
+    /* ── Navbar shrink on scroll ───────────────────── */
+    ScrollTrigger.create({
+      start: 100,
+      onEnter:  () => gsap.to('.site-nav', { padding: '1rem 3rem', duration: .4 }),
+      onLeaveBack: () => gsap.to('.site-nav', { padding: '1.5rem 3rem', duration: .4 })
+    });
+
+    (async () => {
+      try {
+        photos = shuffle(await fetchPhotos());
+        // document.getElementById('photo-count').textContent =
+        //   `${photos.length} photo${photos.length !== 1 ? 's' : ''}`;
+        buildFilters(photos);
+        renderPhotos(photos);
+      } catch (err) {
+        console.error('Lumière error:', err);
+        renderError(err.message);
+      }
+    })();
+  </script>
+</body>
+</html>
