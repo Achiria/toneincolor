@@ -1,4 +1,4 @@
-const EVENTS_ENDPOINT = './events.php';
+const EVENTS_ENDPOINT = './php/events.php';
 const galleryOptions = {
   plugins: [lgZoom, lgThumbnail, lgFullscreen],
   speed: 400,
