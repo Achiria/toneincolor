@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-$eventsDir = __DIR__ . '/events';
+$eventsDir = dirname(__DIR__) . '/events';
 if (!is_dir($eventsDir)) {
     echo json_encode(['success' => true, 'data' => ['list' => []]]);
     exit;
@@ -50,7 +50,7 @@ foreach ($eventDirectories as $eventDirectory) {
         $caption = preg_replace('/[-_]+/', ' ', $caption);
         $caption = preg_replace('/\s*\d{4}[-_]\d{2}[-_]\d{2}\s*/', ' ', $caption);
         $caption = trim(ucwords(strtolower($caption)));
-        $eventUrl = './events/' . rawurlencode($eventDirectory) . '/' . rawurlencode($file);
+        $eventUrl = '../events/' . rawurlencode($eventDirectory) . '/' . rawurlencode($file);
 
         $photos[] = [
             'caption' => $caption,

@@ -15,10 +15,10 @@
 // ============================================================
 // ▶ CONFIGURATION
 // ============================================================
-$PHOTOS_DIR = __DIR__ . '/photos';
-$PHOTOS_URL = './photos';
-$THUMB_DIR  = __DIR__ . '/thumbs';
-$THUMB_URL  = './thumbs';
+$PHOTOS_DIR = dirname(__DIR__) . '/photos';
+$PHOTOS_URL = '../photos';
+$THUMB_DIR  = dirname(__DIR__) . '/thumbs';
+$THUMB_URL  = '../thumbs';
 $THUMB_SIZE = 600; // max thumbnail width/height in pixels
 // ============================================================
 
@@ -26,7 +26,7 @@ header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
 if (!is_dir($PHOTOS_DIR)) {
-    echo json_encode(['success' => false, 'error' => 'Photos folder not found. Create a /photos folder and upload images to it.']);
+    echo json_encode(['success' => false, 'error' => 'Photos folder not found. Create a ../photos folder and upload images to it.']);
     exit;
 }
 
