@@ -1,4 +1,4 @@
-const PROXY = './photos.php';
+const PROXY = '/git/photos.php';
 
     let photos     = [];
     let lgInstance = null;
