@@ -1,4 +1,4 @@
-const EVENTS_ENDPOINT = '/git/events.php';
+const EVENTS_ENDPOINT = '/api/events';
 const galleryOptions = {
   plugins: [lgZoom, lgThumbnail, lgFullscreen],
   speed: 400,
@@ -35,6 +35,14 @@ function createGalleryItem(photo, hidden = false) {
   link.dataset.src = photo.full;
   link.dataset.thumb = photo.thumb;
   link.dataset.subHtml = `<p>${escapeHtml(photo.caption)}</p>`;
+
+  if (hidden) {
+    const thumbnail = document.createElement('img');
+    thumbnail.src = photo.thumb;
+    thumbnail.alt = '';
+    link.appendChild(thumbnail);
+  }
+
   return link;
 }
 

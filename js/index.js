@@ -1,4 +1,4 @@
-const PROXY = '/git/photos.php';
+const PROXY = '/api/photos';
 
 let photos     = [];
 let lgInstance = null;
@@ -110,7 +110,7 @@ function renderError(msg) {
     <div class="icon">⊗</div>
     <h2>Could not load photos</h2>
     <p>${msg}</p>
-    <p>Check that <code>photos.php</code> is uploaded alongside <code>index.html</code>.</p>
+    <p>Check that the <code>/api/photos</code> endpoint is available.</p>
   </div>`;
 }
 
