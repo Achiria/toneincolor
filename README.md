@@ -1,0 +1,1 @@
+Test locally on windows with XAMPP https://sourceforge.net/projects/xampp/
