@@ -15,9 +15,9 @@
 // ============================================================
 // ▶ CONFIGURATION
 // ============================================================
-$PHOTOS_DIR = dirname(__DIR__) . '../photos';
+$PHOTOS_DIR = dirname(__DIR__) . '/photos';
 $PHOTOS_URL = '../photos';
-$THUMB_DIR  = dirname(__DIR__) . '../thumbs';
+$THUMB_DIR  = dirname(__DIR__) . '/thumbs';
 $THUMB_URL  = '../thumbs';
 $THUMB_SIZE = 600; // max thumbnail width/height in pixels
 // ============================================================
